@@ -151,6 +151,7 @@ tr:hover {
     stroke-width: 2;
     stroke-dasharray: 60;
     stroke-dashoffset: 0;
+    transform-origin: center;
     animation: spin 1s linear infinite;
 }
 
@@ -180,7 +181,7 @@ tr:hover {
 }
 
 @keyframes spin {
-    100% {
+    to {
         transform: rotate(360deg);
     }
 }
