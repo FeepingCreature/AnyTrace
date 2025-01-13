@@ -1,0 +1,5 @@
+2024-01-13T10:15:23.856Z [txn=t123] [request=abc123] SELECT * FROM users WHERE id = 1
+2024-01-13T10:15:24.090Z [txn=t123] [request=abc123] COMMIT
+
+2024-01-13T10:16:45.234Z [txn=t124] [request=def456] INSERT INTO orders (failed validation)
+2024-01-13T10:16:45.245Z [txn=t124] [request=def456] ROLLBACK

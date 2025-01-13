@@ -1,0 +1,35 @@
+samplers:
+  - id: nginx_logs
+    name: "Nginx Access Logs"
+    variables:
+      - name: request_id
+        type: string
+        required: true
+    command: "grep ${request_id} example/nginx.log"
+    timeout: 30
+
+  - id: app_logs
+    name: "Application Logs"
+    variables:
+      - name: request_id
+        type: string
+        required: true
+    command: "grep ${request_id} example/app.log"
+    timeout: 30
+
+  - id: db_logs
+    name: "Database Logs"
+    variables:
+      - name: request_id
+        type: string
+        required: true
+    command: "grep ${request_id} example/db.log"
+    timeout: 30
+
+flows:
+  - id: request_trace
+    name: "HTTP Request Trace"
+    samplers:
+      - nginx_logs
+      - app_logs
+      - db_logs

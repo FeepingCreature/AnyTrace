@@ -1,0 +1,8 @@
+2024-01-13 10:15:23 [INFO] Request started id=abc123 user=alice
+2024-01-13 10:15:23 [DEBUG] Processing request abc123
+2024-01-13 10:15:24 [INFO] Database query for request abc123 took 234ms
+2024-01-13 10:15:24 [INFO] Request completed id=abc123 status=200
+                                                                                                                                  
+2024-01-13 10:16:45 [INFO] Request started id=def456 user=bob
+2024-01-13 10:16:45 [ERROR] Invalid input for request def456
+2024-01-13 10:16:45 [INFO] Request completed id=def456 status=400

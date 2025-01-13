@@ -1,0 +1,2 @@
+192.168.1.100 - - [13/Jan/2024:10:15:23 +0000] "GET /api/v1/users HTTP/1.1" 200 1234 "-" "Mozilla/5.0" request_id=abc123
+192.168.1.101 - - [13/Jan/2024:10:16:45 +0000] "POST /api/v1/orders HTTP/1.1" 400 345 "-" "curl/7.68.0" request_id=def456
