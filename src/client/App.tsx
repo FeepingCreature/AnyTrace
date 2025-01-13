@@ -94,7 +94,10 @@ const App: React.FC = () => {
                   <td>
                     <button 
                       className="button"
-                      onClick={() => setSelectedFlow(flow)}
+                      onClick={() => {
+                        console.log('Start Trace clicked for flow:', flow);
+                        setSelectedFlow(flow);
+                      }}
                     >
                       Start Trace
                     </button>
