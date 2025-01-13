@@ -23,9 +23,10 @@ body {
 }
 
 .header {
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.25rem;
     background: var(--background-color);
-    padding: 0.5rem;
+    padding: 0.25rem;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .header h1 {
@@ -33,6 +34,49 @@ body {
     font-weight: 600;
     color: var(--text-primary);
     margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.flow-name {
+    color: var(--text-secondary);
+    font-weight: normal;
+    font-size: 1rem;
+}
+
+.back-link {
+    margin-left: auto;
+    text-decoration: none;
+    color: var(--text-secondary);
+}
+
+.variables-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1rem;
+}
+
+.variables-table td {
+    padding: 0.25rem;
+    border: none;
+}
+
+.var-label {
+    width: 30%;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+.var-input {
+    width: 70%;
+}
+
+.var-input input {
+    width: 100%;
+    padding: 0.25rem;
+    border: 1px solid var(--border-color);
+    font-size: 0.875rem;
 }
 
 .search-bar {

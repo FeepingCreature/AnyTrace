@@ -26,12 +26,14 @@ if (formSubmitted) {
 <Layout title={`Trace: ${flow.name}`}>
   <div class="container">
     <div class="header">
-      <h1>{flow.name}</h1>
+      <h1>
+        AnyTrace 
+        <span class="flow-name">{flow.name}</span>
+        <a href="/" class="back-link">←</a>
+      </h1>
     </div>
-    <a href="/" class="button secondary" style="margin-bottom: 2rem;">Back to Flows</a>
     
     <div class="trace-form">
-      <h2>Execute Trace</h2>
       <form method="get">
         <input type="hidden" name="flowId" value={flowId} />
         {(() => {
@@ -52,22 +54,31 @@ if (formSubmitted) {
             });
           });
           
-          return Array.from(uniqueVars.values()).map(variable => (
-            <div class="form-group">
-              <label>
-                {variable.description || variable.name.split('_').map(word => 
-                  word.charAt(0).toUpperCase() + word.slice(1)
-                ).join(' ')}
-                {variable.required && <span class="required">*</span>}
-              </label>
-              <input
-                type="text"
-                name={variable.name}
-                value={Astro.url.searchParams.get(variable.name) || ''}
-                required={variable.required}
-              />
-            </div>
-          ));
+          const variables = Array.from(uniqueVars.values());
+          return (
+            <table class="variables-table">
+              <tbody>
+                {variables.map(variable => (
+                  <tr>
+                    <td class="var-label">
+                      {variable.description || variable.name.split('_').map(word => 
+                        word.charAt(0).toUpperCase() + word.slice(1)
+                      ).join(' ')}
+                      {variable.required && <span class="required">*</span>}
+                    </td>
+                    <td class="var-input">
+                      <input
+                        type="text"
+                        name={variable.name}
+                        value={Astro.url.searchParams.get(variable.name) || ''}
+                        required={variable.required}
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          );
         })()}
         <div class="form-actions">
           <button type="submit" class="button primary">
