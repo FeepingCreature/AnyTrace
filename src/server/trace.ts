@@ -92,13 +92,24 @@ export async function executeTrace(request: TraceRequest): Promise<TraceResult> 
 
   // Create an async generator that yields results as they complete
   const resultsGenerator = async function*() {
+    // Create a Map to track promises and their samplerIds
+    const promiseMap = new Map();
+    samplerPromises.forEach((promise, index) => {
+      promiseMap.set(promise, flow.samplers[index]);
+    });
+
     const pending = [...samplerPromises];
     while (pending.length > 0) {
+      console.log('Waiting for next promise, pending:', pending.length);
       const completedPromise = await Promise.race(pending);
-      const index = pending.findIndex(p => p === completedPromise);
-      pending.splice(index, 1);
+      const samplerId = promiseMap.get(completedPromise);
+      console.log('Completed sampler:', samplerId);
+
+      // Remove from pending array
+      pending.splice(pending.indexOf(completedPromise), 1);
 
       const result = await completedPromise;
+      console.log('Got result for:', result.samplerId);
       const script = `
         (function() {
           const result = ${JSON.stringify(result)};
