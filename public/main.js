@@ -124,9 +124,7 @@ async function handleTraceSubmit(event) {
         });
 
         const result = await response.json();
-        console.log('Trace result:', result);
-        // TODO: Display results in UI
-        hideTraceForm();
+        window.location.href = `/trace.html?id=${result.traceId}`;
     } catch (error) {
         console.error('Failed to execute trace:', error);
     }
