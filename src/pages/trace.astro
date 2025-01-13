@@ -41,7 +41,7 @@ delete variables.flowId;
       ))}
     </div>
   </div>
-  <script>
+  <script is:inline>
     const events = new EventSource(`/api/trace/events?${window.location.search.slice(1)}`);
 
     events.onmessage = (event) => {
