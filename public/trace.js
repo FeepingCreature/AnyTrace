@@ -1,24 +1,37 @@
-// Get trace ID from URL
+// Get parameters from URL
 const params = new URLSearchParams(window.location.search);
-const traceId = params.get('id');
+const flowId = params.get('flowId');
 
-if (!traceId) {
+if (!flowId) {
     window.location.href = '/';
 }
 
 // DOM Elements
 const samplersList = document.getElementById('samplersList');
 
-// WebSocket connection
-const ws = new WebSocket(`ws://${window.location.host}/ws/trace/${traceId}`);
+// EventSource for updates
+const events = new EventSource(`/api/trace/events?${params.toString()}`);
 
-ws.onmessage = (event) => {
+events.onmessage = (event) => {
     const update = JSON.parse(event.data);
+
+    if (update.error) {
+        console.error('Trace error:', update.error);
+        events.close();
+        return;
+    }
+
+    if (update.done) {
+        events.close();
+        return;
+    }
+
     updateSamplerStatus(update);
 };
 
-ws.onerror = (error) => {
-    console.error('WebSocket error:', error);
+events.onerror = (error) => {
+    console.error('EventSource error:', error);
+    events.close();
 };
 
 // Initialize trace view

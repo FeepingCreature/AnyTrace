@@ -38,13 +38,12 @@ app.get('/api/flows', (req, res) => {
   }
 });
 
-app.get('/trace/:flowId', (req, res) => {
+app.get('/trace', (req, res) => {
   res.sendFile(path.join(__dirname, '../../public/trace.html'));
 });
 
-app.get('/api/trace/:flowId/events', (req, res) => {
-  const flowId = req.params.flowId;
-  const variables = req.query;
+app.get('/api/trace/events', (req, res) => {
+  const { flowId, ...variables } = req.query;
 
   res.setHeader('Content-Type', 'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache');

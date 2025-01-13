@@ -112,8 +112,11 @@ async function handleTraceSubmit(event) {
     }
 
     try {
-        const queryString = new URLSearchParams(variables).toString();
-        window.location.href = `/trace/${currentFlow.id}?${queryString}`;
+        const queryString = new URLSearchParams({
+            flowId: currentFlow.id,
+            ...variables
+        }).toString();
+        window.location.href = `/trace?${queryString}`;
     } catch (error) {
         console.error('Failed to execute trace:', error);
     }
