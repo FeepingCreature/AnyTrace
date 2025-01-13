@@ -42,14 +42,12 @@ export class ConfigLoader {
         } catch (error) {
             const message = error instanceof Error ? error.message : 'Unknown error';
             console.error('Failed to load configuration:', message);
-            throw new Error(`Failed to load configuration: ${message}`);
+            // Return empty config instead of throwing
+            return { samplers: [], flows: [] };
         }
     }
 
     getConfig(): AnyTraceConfig {
-        if (!this.config) {
-            throw new Error('Configuration not loaded');
-        }
-        return this.config;
+        return this.loadConfig();
     }
 }
