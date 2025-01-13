@@ -56,20 +56,22 @@ delete variables?.flowId;
     ) : (
       <div class="samplers-list" id="samplersList">
         {samplers.map(sampler => (
-        <div class="sampler-item" id={`sampler-${sampler.id}`}>
-          <div class="sampler-header">
-            <span class="sampler-status pending">
-              <svg class="icon" viewBox="0 0 24 24">
-                <circle class="spinner" cx="12" cy="12" r="10" />
-              </svg>
-            </span>
-            <h3>{sampler.name}</h3>
+          <div class="sampler-item" id={`sampler-${sampler.id}`}>
+            <div class="sampler-header">
+              <span class="sampler-status pending">
+                <svg class="icon" viewBox="0 0 24 24">
+                  <circle class="spinner" cx="12" cy="12" r="10" />
+                </svg>
+              </span>
+              <h3>{sampler.name}</h3>
+            </div>
+            <div class="sampler-output">
+              <pre><code></code></pre>
+            </div>
           </div>
-          <div class="sampler-output">
-            <pre><code></code></pre>
-          </div>
-        </div>
-      ))}
+        ))}
+      </div>
+    )}
     </div>
   </div>
   <script is:inline>
