@@ -28,7 +28,7 @@ function displayFlows(flowsToDisplay) {
         <tr>
             <td>${flow.name}</td>
             <td>
-                <button class="button primary" onclick="showTraceForm('${flow.id}')">
+                <button class="button primary" onclick="window.showTraceForm('${flow.id}')">
                     Execute
                 </button>
             </td>
@@ -44,7 +44,8 @@ function filterFlows() {
     displayFlows(filteredFlows);
 }
 
-async function showTraceForm(flowId) {
+// Expose function globally
+window.showTraceForm = async function(flowId) {
     currentFlow = flows.find(f => f.id === flowId);
     if (!currentFlow) return;
 
