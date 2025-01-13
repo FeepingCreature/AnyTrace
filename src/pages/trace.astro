@@ -17,19 +17,17 @@ const samplers = flow.samplers.map(samplerId =>
 ).filter(Boolean);
 
 const formSubmitted = Astro.url.searchParams.has('request_id');
-// Initialize trace execution and results
-let traceResults = formSubmitted && {
-  flowId,
-  results: flow.samplers.map(samplerId => {
-    const sampler = config.samplers.find(s => s.id === samplerId);
-    return {
-      samplerId,
-      name: sampler?.name || 'Unknown',
-      status: 'pending',
-      output: ''
-    };
-  })
-};
+let traceExecution;
+let traceResults;
+
+if (formSubmitted) {
+  const variables = Object.fromEntries(Astro.url.searchParams.entries());
+  traceExecution = await executeTrace({ flowId, variables });
+  traceResults = {
+    flowId: traceExecution.flowId,
+    results: traceExecution.samplerPromises
+  };
+}
 ---
 <Layout title={`Trace: ${flow.name}`}>
   <div class="container">

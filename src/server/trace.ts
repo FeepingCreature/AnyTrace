@@ -74,13 +74,7 @@ export async function executeTrace(request: TraceRequest): Promise<TraceResult> 
   if (!flow) {
     throw new Error(`Flow not found: ${request.flowId}`);
   }
-
-  // Initialize results array
-  const results: SamplerResult[] = new Array(flow.samplers.length);
   
-  // Create array to track pending promises
-  const pending: Promise<any>[] = [];
-
   // Execute samplers in parallel with self-removing promises
   const samplerPromises = flow.samplers.map(async (samplerId, index) => {
     const sampler = config.samplers.find(s => s.id === samplerId);
@@ -88,24 +82,11 @@ export async function executeTrace(request: TraceRequest): Promise<TraceResult> 
       throw new Error(`Sampler not found: ${samplerId}`);
     }
 
-    // Create a promise that removes itself from pending when done
-    const promise = executeSampler(sampler, request.variables).then(result => {
-      results[index] = result;
-      const idx = pending.indexOf(promise);
-      if (idx > -1) {
-        pending.splice(idx, 1);
-      }
-      return result;
-    });
-
-    // Add to pending array
-    pending.push(promise);
-    return promise;
+    return executeSampler(sampler, request.variables);
   });
 
   return {
     flowId: flow.id,
-    results,
     samplerPromises
   }
 }
