@@ -121,7 +121,7 @@ if (formSubmitted) {
               </div>
             </div>
             <div class="sampler-output" id={`output-${result.samplerId}`}>
-              <pre><code>{result.output || result.error || 'No matches found'}</code></pre>
+              <pre><code set:html={result.output || result.error || 'No matches found'}></code></pre>
             </div>
           </div>
         ))}

@@ -270,6 +270,11 @@ tr:hover {
     white-space: pre-wrap;
 }
 
+.sampler-output strong {
+    color: #fbbf24;
+    font-weight: bold;
+}
+
 @keyframes spin {
     to {
         transform: rotate(360deg);

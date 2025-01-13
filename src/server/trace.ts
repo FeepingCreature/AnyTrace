@@ -34,10 +34,24 @@ async function executeSampler(sampler: Sampler, variables: Record<string, string
   try {
     const { stdout, stderr } = await execAsync(command, { timeout: sampler.timeout * 1000 });
     
+    // Get all variable values to highlight
+    const searchTerms = Object.values(variables).filter(Boolean);
+    
+    // Escape special regex characters and create a regex pattern
+    const pattern = searchTerms
+      .map(term => term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+      .join('|');
+    
+    // Replace matches with bold tags
+    const highlightedOutput = stdout.replace(
+      new RegExp(`(${pattern})`, 'gi'),
+      '<strong>$1</strong>'
+    );
+    
     return {
       samplerId: sampler.id,
       name: sampler.name,
-      output: stdout,
+      output: highlightedOutput,
       error: stderr || undefined,
       status: stdout.trim() ? 'success' : 'no-match'
     };
