@@ -153,13 +153,12 @@ tr:hover {
 .samplers-list {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
-    margin-top: 1rem;
+    margin-top: 0.5rem;
 }
 
 .sampler-item {
     background: var(--surface-color);
-    padding: 0.25rem;
+    padding: 0.125rem 0.25rem;
     border-bottom: 1px solid var(--border-color);
 }
 
