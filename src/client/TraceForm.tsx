@@ -9,6 +9,8 @@ interface TraceFormProps {
 }
 
 const TraceForm: React.FC<TraceFormProps> = ({ flow, samplers, onClose, onSubmit }) => {
+  console.log('TraceForm rendered with flow:', flow);
+  console.log('Available samplers:', samplers);
   const [variables, setVariables] = useState<Record<string, string>>({});
 
   // Get all unique variables from the flow's samplers

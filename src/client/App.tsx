@@ -103,6 +103,7 @@ const App: React.FC = () => {
                       className="button"
                       onClick={() => {
                         console.log('Start Trace clicked for flow:', flow);
+                        console.log('Setting selectedFlow state');
                         setSelectedFlow(flow);
                       }}
                     >
