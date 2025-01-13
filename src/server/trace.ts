@@ -90,34 +90,39 @@ export async function executeTrace(request: TraceRequest): Promise<TraceResult> 
     return result;
   });
 
-  // Create a promise that resolves with the results and scripts
-  const promise = Promise.all(samplerPromises).then(finalResults => ({
-    results: finalResults,
-    scripts: finalResults.map(result => ({
-      samplerId: result.samplerId,
-      script: `
+  // Create an async generator that yields results as they complete
+  const resultsGenerator = async function*() {
+    const pending = [...samplerPromises];
+    while (pending.length > 0) {
+      const completedPromise = await Promise.race(pending);
+      const index = pending.findIndex(p => p === completedPromise);
+      pending.splice(index, 1);
+
+      const result = await completedPromise;
+      const script = `
         (function() {
           const result = ${JSON.stringify(result)};
           const samplerElement = document.querySelector('[data-sampler-id="${result.samplerId}"]');
           if (samplerElement) {
             const statusElement = samplerElement.querySelector('.sampler-status');
             const outputElement = samplerElement.querySelector('.sampler-output code');
-            
+
             statusElement.className = 'sampler-status ' + result.status;
             statusElement.innerHTML = getStatusIcon(result.status);
-            
+
             if (result.output || result.error) {
               outputElement.innerHTML = result.output || result.error;
             }
           }
         })();
-      `
-    }))
-  }));
+      `;
+
+      yield { result, script };
+    }
+  };
 
   return {
     flowId: flow.id,
     results,
-    promise
-  };
+    resultsGenerator: resultsGenerator()
 }

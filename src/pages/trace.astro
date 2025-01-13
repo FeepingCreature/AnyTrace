@@ -182,10 +182,13 @@ if (formSubmitted) {
     }
   </script>
   {formSubmitted && (async () => {
-    const executionResults = await traceExecution.promise;
+    const scripts = [];
+    for await (const { script } of traceExecution.resultsGenerator) {
+      scripts.push(script);
+    }
     return (
       <Fragment>
-        {executionResults.scripts.map(({script}) => (
+        {scripts.map(script => (
           <script is:inline set:html={script}></script>
         ))}
       </Fragment>
