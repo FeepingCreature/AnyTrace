@@ -75,19 +75,34 @@ export async function executeTrace(request: TraceRequest): Promise<TraceResult> 
     throw new Error(`Flow not found: ${request.flowId}`);
   }
 
-  // Execute all samplers in parallel
-  const samplerPromises = flow.samplers.map(samplerId => {
+  // Execute samplers in parallel and stream results
+  const samplerPromises = flow.samplers.map(async (samplerId) => {
     const sampler = config.samplers.find(s => s.id === samplerId);
     if (!sampler) {
       throw new Error(`Sampler not found: ${samplerId}`);
     }
-    return executeSampler(sampler, request.variables);
+    
+    const result = await executeSampler(sampler, request.variables);
+    
+    // Stream the result
+    const chunk = new TextEncoder().encode(JSON.stringify(result) + '\n');
+    await Astro.response.write(chunk);
+    
+    return result;
   });
 
-  const results = await Promise.all(samplerPromises);
+  // Execute all samplers but don't wait for completion
+  Promise.all(samplerPromises).then(() => {
+    Astro.response.end();
+  });
 
   return {
     flowId: flow.id,
-    results
+    results: flow.samplers.map(samplerId => ({
+      samplerId,
+      name: config.samplers.find(s => s.id === samplerId)?.name || 'Unknown',
+      status: 'pending',
+      output: ''
+    }))
   };
 }
