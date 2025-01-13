@@ -1,21 +1,34 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Flow } from '../types/config';
+import { Flow, Sampler } from '../types/config';
+import TraceForm from './TraceForm';
 
 const App: React.FC = () => {
   const [flows, setFlows] = useState<Flow[]>([]);
+  const [samplers, setSamplers] = useState<Sampler[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedFlow, setSelectedFlow] = useState<Flow | null>(null);
 
   useEffect(() => {
-    const fetchFlows = async () => {
+    const fetchData = async () => {
       try {
-        const response = await fetch('/api/flows');
-        if (!response.ok) {
-          throw new Error('Failed to fetch flows');
+        const [flowsResponse, samplersResponse] = await Promise.all([
+          fetch('/api/flows'),
+          fetch('/api/samplers')
+        ]);
+        
+        if (!flowsResponse.ok || !samplersResponse.ok) {
+          throw new Error('Failed to fetch data');
         }
-        const data = await response.json();
-        setFlows(data);
+        
+        const [flowsData, samplersData] = await Promise.all([
+          flowsResponse.json(),
+          samplersResponse.json()
+        ]);
+        
+        setFlows(flowsData);
+        setSamplers(samplersData);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An error occurred');
       } finally {
@@ -23,7 +36,7 @@ const App: React.FC = () => {
       }
     };
 
-    fetchFlows();
+    fetchData();
   }, []);
 
   const filteredFlows = useMemo(() => {
@@ -81,7 +94,7 @@ const App: React.FC = () => {
                   <td>
                     <button 
                       className="button"
-                      onClick={() => console.log('Selected flow:', flow.id)}
+                      onClick={() => setSelectedFlow(flow)}
                     >
                       Start Trace
                     </button>
@@ -92,6 +105,38 @@ const App: React.FC = () => {
           </table>
         )}
       </div>
+
+      {selectedFlow && (
+        <TraceForm
+          flow={selectedFlow}
+          samplers={samplers}
+          onClose={() => setSelectedFlow(null)}
+          onSubmit={async (variables) => {
+            try {
+              const response = await fetch('/api/trace', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  flowId: selectedFlow.id,
+                  variables
+                }),
+              });
+              
+              if (!response.ok) {
+                throw new Error('Failed to start trace');
+              }
+              
+              const result = await response.json();
+              console.log('Trace started:', result);
+              setSelectedFlow(null);
+            } catch (err) {
+              setError(err instanceof Error ? err.message : 'Failed to start trace');
+            }
+          }}
+        />
+      )}
     </div>
   );
 };

@@ -33,6 +33,15 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 // Serve list of flows
+app.get('/api/samplers', (req, res) => {
+  try {
+    const config = configLoader.getConfig();
+    res.json(config.samplers);
+  } catch (error) {
+    res.status(500).json({ error: (error as Error).message });
+  }
+});
+
 app.get('/api/flows', (req, res) => {
   try {
     const config = configLoader.getConfig();
