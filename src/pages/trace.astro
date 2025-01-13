@@ -18,8 +18,7 @@ const samplers = flow.samplers.map(samplerId =>
 
 const formSubmitted = Astro.url.searchParams.has('request_id');
 // Initialize trace execution and results
-let traceExecution;
-let traceResults = formSubmitted ? {
+let traceResults = formSubmitted && {
   flowId,
   results: flow.samplers.map(samplerId => {
     const sampler = config.samplers.find(s => s.id === samplerId);
@@ -30,30 +29,7 @@ let traceResults = formSubmitted ? {
       output: ''
     };
   })
-} : null;
-
-// If form is submitted, start trace execution
-if (formSubmitted) {
-  const variables = Object.fromEntries(Astro.url.searchParams.entries());
-  delete variables.flowId;
-  
-  // Start trace execution but don't wait for results yet
-  traceExecution = await executeTrace({ flowId, variables });
-  
-  // Initialize with pending state
-  traceResults = {
-    flowId,
-    results: flow.samplers.map(samplerId => {
-      const sampler = config.samplers.find(s => s.id === samplerId);
-      return {
-        samplerId,
-        name: sampler?.name || 'Unknown',
-        status: 'pending',
-        output: ''
-      };
-    })
-  };
-}
+};
 ---
 <Layout title={`Trace: ${flow.name}`}>
   <div class="container">
@@ -184,7 +160,9 @@ if (formSubmitted) {
   {formSubmitted && traceResults.results.map((result, index) => (
     <Fragment>
       {(async () => {
+        console.log(`fragment ${index} awaits result`);
         const finalResult = await result;
+        console.log(`fragment ${index} done: ${JSON.stringify(finalResult)}`);
         return (
           <script is:inline set:html={`
             (function() {
