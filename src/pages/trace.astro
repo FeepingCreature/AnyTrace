@@ -6,6 +6,7 @@ import { executeTrace } from '../server/trace';
 const flowId = Astro.url.searchParams.get('flowId');
 const config = ConfigLoader.getInstance().loadConfig();
 const flow = config.flows.find(f => f.id === flowId);
+export const prerender = false;
 
 if (!flow || config.flows.length === 0) {
   return Astro.redirect('/');
