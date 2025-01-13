@@ -148,8 +148,8 @@ tr:hover {
 .sampler-status.pending .spinner {
     fill: none;
     stroke: var(--text-secondary);
-    stroke-width: 2;
-    stroke-dasharray: 60;
+    stroke-width: 3;
+    stroke-dasharray: 40 20;
     stroke-dashoffset: 0;
     transform-origin: center;
     animation: spin 1s linear infinite;
