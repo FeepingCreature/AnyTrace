@@ -1,0 +1,45 @@
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.flows-list {
+    margin-top: 20px;
+}
+
+.flow-item {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 15px;
+    margin-bottom: 10px;
+    background-color: #f9f9f9;
+}
+
+.flow-item h3 {
+    margin: 0 0 10px 0;
+    color: #333;
+}
+
+.flow-item p {
+    margin: 5px 0;
+    color: #666;
+}
+
+button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+}

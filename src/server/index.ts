@@ -19,6 +19,16 @@ try {
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../../public')));
 
+// Serve list of flows
+app.get('/api/flows', (req, res) => {
+  try {
+    const config = configLoader.getConfig();
+    res.json(config.flows);
+  } catch (error) {
+    res.status(500).json({ error: (error as Error).message });
+  }
+});
+
 app.post('/api/trace', async (req, res) => {
   try {
     const result = await executeTrace(req.body);
