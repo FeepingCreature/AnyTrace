@@ -117,4 +117,10 @@ if (formSubmitted) {
     )}
     </div>
   </div>
+  <script is:inline>
+    function toggleOutput(samplerId) {
+      const output = document.getElementById(`output-${samplerId}`);
+      output.classList.toggle('expanded');
+    }
+  </script>
 </Layout>
