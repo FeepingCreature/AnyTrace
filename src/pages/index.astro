@@ -1,0 +1,46 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { ConfigLoader } from '../config/loader';
+
+const config = ConfigLoader.getInstance().getConfig();
+const flows = config.flows;
+---
+<Layout title="AnyTrace">
+  <div class="container">
+    <div class="header">
+      <h1>AnyTrace</h1>
+    </div>
+    <div class="search-bar">
+      <input type="text" id="searchInput" class="search-input" placeholder="Search flows..." />
+    </div>
+    <div class="flows-table">
+      <table>
+        <thead>
+          <tr>
+            <th>Flow Name</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="flowsTableBody">
+          {flows.map(flow => (
+            <tr>
+              <td>{flow.name}</td>
+              <td>
+                <button class="button primary" onclick={`showTraceForm('${flow.id}')`}>
+                  Execute
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div id="traceFormOverlay" class="trace-form-overlay" style="display: none;">
+    <div class="trace-form">
+      <h2>Execute Trace</h2>
+      <form id="traceForm"></form>
+    </div>
+  </div>
+  <script src="/main.js"></script>
+</Layout>

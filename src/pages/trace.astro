@@ -1,0 +1,82 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { ConfigLoader } from '../config/loader';
+import { executeTrace } from '../server/trace';
+
+const flowId = Astro.url.searchParams.get('flowId');
+const config = ConfigLoader.getInstance().getConfig();
+const flow = config.flows.find(f => f.id === flowId);
+
+if (!flow) {
+  return Astro.redirect('/');
+}
+
+const samplers = flow.samplers.map(samplerId =>
+  config.samplers.find(s => s.id === samplerId)
+).filter(Boolean);
+
+const variables = Object.fromEntries(Astro.url.searchParams.entries());
+delete variables.flowId;
+---
+<Layout title={`Trace: ${flow.name}`}>
+  <div class="container">
+    <div class="header">
+      <h1>{flow.name}</h1>
+    </div>
+    <div class="samplers-list" id="samplersList">
+      {samplers.map(sampler => (
+        <div class="sampler-item" id={`sampler-${sampler.id}`}>
+          <div class="sampler-header">
+            <span class="sampler-status pending">
+              <svg class="icon" viewBox="0 0 24 24">
+                <circle class="spinner" cx="12" cy="12" r="10" />
+              </svg>
+            </span>
+            <h3>{sampler.name}</h3>
+          </div>
+          <div class="sampler-output">
+            <pre><code></code></pre>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+  <script>
+    const events = new EventSource(`/api/trace/events?${window.location.search.slice(1)}`);
+
+    events.onmessage = (event) => {
+      const update = JSON.parse(event.data);
+
+      if (update.error) {
+        console.error('Trace error:', update.error);
+        events.close();
+        return;
+      }
+
+      if (update.done) {
+        events.close();
+        return;
+      }
+
+      const samplerElement = document.getElementById(`sampler-${update.samplerId}`);
+      if (!samplerElement) return;
+
+      const statusElement = samplerElement.querySelector('.sampler-status');
+      const outputElement = samplerElement.querySelector('.sampler-output');
+      const codeElement = outputElement.querySelector('code');
+
+      statusElement.className = `sampler-status ${update.status}`;
+      if (update.output) {
+        codeElement.textContent = update.output;
+      }
+      if (update.error) {
+        codeElement.textContent = update.error;
+      }
+    };
+
+    events.onerror = (error) => {
+      console.error('EventSource error:', error);
+      events.close();
+    };
+  </script>
+</Layout>

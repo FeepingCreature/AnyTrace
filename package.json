@@ -4,9 +4,10 @@
   "description": "Microservice tracing tool with shell script execution capabilities",
   "main": "dist/server/index.js",
   "scripts": {
-    "start": "node dist/server/index.js",
-    "dev": "ts-node-dev --respawn --transpile-only src/server/index.ts",
-    "build": "tsc",
+    "start": "node ./dist/server/entry.mjs",
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
     "test": "jest",
     "lint": "eslint . --ext .ts"
   },
