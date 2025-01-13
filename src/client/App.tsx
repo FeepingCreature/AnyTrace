@@ -106,11 +106,16 @@ const App: React.FC = () => {
                       className="button"
                       onClick={(e) => {
                         e.preventDefault();
-                        console.log('Start Trace clicked for flow:', flow);
-                        console.log('Current selectedFlow:', selectedFlow);
-                        console.log('Setting selectedFlow state to:', flow);
-                        setSelectedFlow(flow);
-                        console.log('State set, selectedFlow should update');
+                        const btn = e.currentTarget;
+                        console.log('Button clicked:', btn);
+                        console.log('Event:', e);
+                        console.log('Flow:', flow);
+                        try {
+                          setSelectedFlow(flow);
+                          console.log('setSelectedFlow called');
+                        } catch (err) {
+                          console.error('Error in setSelectedFlow:', err);
+                        }
                       }}
                     >
                       Start Trace
