@@ -31,8 +31,18 @@ delete variables?.flowId;
         <h2>Execute Trace</h2>
         <form method="get">
           <input type="hidden" name="flowId" value={flowId} />
-          {samplers.flatMap(sampler => 
-            sampler.variables.map(variable => (
+          {(() => {
+            // Deduplicate variables by name
+            const uniqueVars = new Map();
+            samplers.forEach(sampler => {
+              sampler.variables.forEach(variable => {
+                if (!uniqueVars.has(variable.name)) {
+                  uniqueVars.set(variable.name, variable);
+                }
+              });
+            });
+            
+            return Array.from(uniqueVars.values()).map(variable => (
               <div class="form-group">
                 <label>
                   {variable.name}
@@ -44,8 +54,8 @@ delete variables?.flowId;
                   required={variable.required}
                 />
               </div>
-            ))
-          )}
+            ));
+          })()}
           <div class="form-actions">
             <button type="submit" class="button primary">
               Execute
