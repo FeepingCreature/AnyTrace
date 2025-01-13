@@ -20,15 +20,6 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, '../../public')));
 
 // API endpoints
-app.get('/api/flows', (req, res) => {
-  try {
-    const config = configLoader.getConfig();
-    res.json(config.flows);
-  } catch (error) {
-    res.status(500).json({ error: (error as Error).message });
-  }
-});
-
 app.get('/api/samplers', (req, res) => {
   try {
     const config = configLoader.getConfig();
