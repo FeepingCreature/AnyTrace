@@ -170,11 +170,14 @@ if (formSubmitted) {
       }
     }
   </script>
-  {formSubmitted && (
-    <Fragment>
-      {(await traceExecution.promise).scripts.map(({script}) => (
-        <script is:inline set:html={script}></script>
-      ))}
-    </Fragment>
-  )}
+  {formSubmitted && (async () => {
+    const executionResults = await traceExecution.promise;
+    return (
+      <Fragment>
+        {executionResults.scripts.map(({script}) => (
+          <script is:inline set:html={script}></script>
+        ))}
+      </Fragment>
+    );
+  })()}
 </Layout>
