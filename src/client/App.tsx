@@ -112,6 +112,7 @@ const App: React.FC = () => {
           samplers={samplers}
           onClose={() => setSelectedFlow(null)}
           onSubmit={async (variables) => {
+            console.log('Submitting trace:', { flowId: selectedFlow.id, variables });
             try {
               const response = await fetch('/api/trace', {
                 method: 'POST',
@@ -129,7 +130,8 @@ const App: React.FC = () => {
               }
               
               const result = await response.json();
-              console.log('Trace started:', result);
+              console.log('Trace result:', result);
+              alert('Trace completed successfully!');
               setSelectedFlow(null);
             } catch (err) {
               setError(err instanceof Error ? err.message : 'Failed to start trace');

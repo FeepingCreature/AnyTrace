@@ -29,6 +29,7 @@ function interpolateCommand(command: string, variables: Record<string, string>):
 
 async function executeSampler(sampler: Sampler, variables: Record<string, string>): Promise<SamplerResult> {
   const command = interpolateCommand(sampler.command, variables);
+  console.log(`Executing sampler ${sampler.id} with command:`, command);
   
   try {
     const { stdout, stderr } = await execAsync(command, { timeout: sampler.timeout * 1000 });

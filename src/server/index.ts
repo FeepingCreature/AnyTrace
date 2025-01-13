@@ -53,6 +53,7 @@ app.get('/api/flows', (req, res) => {
 
 app.post('/api/trace', async (req, res) => {
   try {
+    console.log('Received trace request:', req.body);
     const { flowId, variables } = req.body;
     
     if (!flowId || typeof flowId !== 'string') {
