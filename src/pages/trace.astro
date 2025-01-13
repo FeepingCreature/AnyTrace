@@ -169,10 +169,10 @@ if (formSubmitted) {
               if (samplerElement) {
                 const statusElement = samplerElement.querySelector('.sampler-status');
                 const outputElement = samplerElement.querySelector('.sampler-output code');
-                
+
                 statusElement.className = 'sampler-status ' + result.status;
                 statusElement.innerHTML = getStatusIcon(result.status);
-                
+
                 if (result.output || result.error) {
                   outputElement.innerHTML = result.output || result.error;
                 }
