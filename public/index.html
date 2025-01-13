@@ -4,9 +4,38 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AnyTrace</title>
+    <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-    <div id="root"></div>
-    <script src="/bundle.js"></script>
+    <div class="container">
+        <div class="header">
+            <h1>AnyTrace</h1>
+        </div>
+        <div class="search-bar">
+            <input type="text" id="searchInput" class="search-input" placeholder="Search flows...">
+        </div>
+        <div class="flows-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Flow Name</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="flowsTableBody">
+                    <!-- Flows will be inserted here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div id="traceFormOverlay" class="trace-form-overlay" style="display: none;">
+        <div class="trace-form">
+            <h2>Execute Trace</h2>
+            <form id="traceForm">
+                <!-- Variables will be inserted here -->
+            </form>
+        </div>
+    </div>
+    <script src="/main.js"></script>
 </body>
 </html>
