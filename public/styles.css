@@ -45,10 +45,38 @@ body {
     font-size: 1rem;
 }
 
-.back-link {
-    margin-left: auto;
+.home-link {
+    text-decoration: none;
+    color: var(--text-primary);
+}
+
+.home-link:hover {
+    color: var(--primary-color);
+}
+
+.back-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    background: var(--border-color);
+    border-radius: 12px;
+    margin-left: 0.5rem;
+}
+
+.back-button a {
     text-decoration: none;
     color: var(--text-secondary);
+    line-height: 1;
+}
+
+.back-button:hover {
+    background: var(--text-secondary);
+}
+
+.back-button:hover a {
+    color: white;
 }
 
 .variables-table {
