@@ -125,4 +125,5 @@ export async function executeTrace(request: TraceRequest): Promise<TraceResult> 
     flowId: flow.id,
     results,
     resultsGenerator: resultsGenerator()
+  }
 }
