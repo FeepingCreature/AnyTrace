@@ -8,6 +8,7 @@ A microservice tracing tool that allows you to trace configurable events through
 - Backend capability to execute shell scripts
 - Real-time trace visualization
 - Configurable event tracking
+- YAML-based configuration system
 
 ## Setup
 
@@ -17,7 +18,10 @@ npm install
 
 ## Configuration
 
-Create a `config.yaml` file in your project directory:
+AnyTrace uses YAML configuration files to define samplers and flows. By default, it looks for `config.yaml` in the current directory.
+
+### Default Configuration Location
+Create `config.yaml` in your project directory:
 
 ```yaml
 samplers:
@@ -37,7 +41,8 @@ flows:
       - example_sampler
 ```
 
-You can specify a custom config location using the CONFIG_PATH environment variable:
+### Custom Configuration
+You can specify a custom config location using:
 
 ```bash
 CONFIG_PATH=/path/to/custom/config.yaml npm start
@@ -59,6 +64,27 @@ Build the project:
 npm run build
 ```
 
+## Deployment
+
+1. Build the project:
+```bash
+npm run build
+```
+
+2. Start with default config:
+```bash
+npm start
+```
+
+Or with custom config:
+```bash
+CONFIG_PATH=/etc/anytrace/config.yaml npm start
+```
+
 ## Security Note
 
-This tool executes shell commands on the host system. Please ensure proper security measures are in place and only run trusted configurations.
+This tool executes shell commands on the host system. Please ensure:
+- Only trusted configurations are used
+- Input validation is enabled
+- Proper access controls are in place
+- Command execution is restricted as needed
