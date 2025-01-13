@@ -181,17 +181,30 @@ if (formSubmitted) {
       }
     }
   </script>
-  {formSubmitted && (async () => {
-    const scripts = [];
-    for await (const { script } of traceExecution.resultsGenerator) {
-      scripts.push(script);
-    }
-    return (
-      <Fragment>
-        {scripts.map(script => (
-          <script is:inline set:html={script}></script>
-        ))}
-      </Fragment>
-    );
-  })()}
+  {formSubmitted && traceResults.results.map((result, index) => (
+    <Fragment>
+      {(async () => {
+        const finalResult = await result;
+        return (
+          <script is:inline set:html={`
+            (function() {
+              const result = ${JSON.stringify(finalResult)};
+              const samplerElement = document.querySelector('[data-sampler-id="${finalResult.samplerId}"]');
+              if (samplerElement) {
+                const statusElement = samplerElement.querySelector('.sampler-status');
+                const outputElement = samplerElement.querySelector('.sampler-output code');
+                
+                statusElement.className = 'sampler-status ' + result.status;
+                statusElement.innerHTML = getStatusIcon(result.status);
+                
+                if (result.output || result.error) {
+                  outputElement.innerHTML = result.output || result.error;
+                }
+              }
+            })();
+          `}></script>
+        );
+      })()}
+    </Fragment>
+  ))}
 </Layout>

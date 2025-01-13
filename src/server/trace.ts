@@ -78,63 +78,34 @@ export async function executeTrace(request: TraceRequest): Promise<TraceResult> 
   // Initialize results array
   const results: SamplerResult[] = new Array(flow.samplers.length);
   
-  // Execute samplers in parallel
+  // Create array to track pending promises
+  const pending: Promise<any>[] = [];
+
+  // Execute samplers in parallel with self-removing promises
   const samplerPromises = flow.samplers.map(async (samplerId, index) => {
     const sampler = config.samplers.find(s => s.id === samplerId);
     if (!sampler) {
       throw new Error(`Sampler not found: ${samplerId}`);
     }
-    
-    const result = await executeSampler(sampler, request.variables);
-    results[index] = result;
-    return result;
-  });
 
-  // Create an async generator that yields results as they complete
-  const resultsGenerator = async function*() {
-    // Create a Map to track promises and their samplerIds
-    const promiseMap = new Map();
-    samplerPromises.forEach((promise, index) => {
-      promiseMap.set(promise, flow.samplers[index]);
+    // Create a promise that removes itself from pending when done
+    const promise = executeSampler(sampler, request.variables).then(result => {
+      results[index] = result;
+      const idx = pending.indexOf(promise);
+      if (idx > -1) {
+        pending.splice(idx, 1);
+      }
+      return result;
     });
 
-    const pending = [...samplerPromises];
-    while (pending.length > 0) {
-      console.log('Waiting for next promise, pending:', pending.length);
-      const completedPromise = await Promise.race(pending);
-      const samplerId = promiseMap.get(completedPromise);
-      console.log('Completed sampler:', samplerId);
-
-      // Remove from pending array
-      pending.splice(pending.indexOf(completedPromise), 1);
-
-      const result = await completedPromise;
-      console.log('Got result for:', result.samplerId);
-      const script = `
-        (function() {
-          const result = ${JSON.stringify(result)};
-          const samplerElement = document.querySelector('[data-sampler-id="${result.samplerId}"]');
-          if (samplerElement) {
-            const statusElement = samplerElement.querySelector('.sampler-status');
-            const outputElement = samplerElement.querySelector('.sampler-output code');
-
-            statusElement.className = 'sampler-status ' + result.status;
-            statusElement.innerHTML = getStatusIcon(result.status);
-
-            if (result.output || result.error) {
-              outputElement.innerHTML = result.output || result.error;
-            }
-          }
-        })();
-      `;
-
-      yield { result, script };
-    }
-  };
+    // Add to pending array
+    pending.push(promise);
+    return promise;
+  });
 
   return {
     flowId: flow.id,
     results,
-    resultsGenerator: resultsGenerator()
+    samplerPromises
   }
 }
