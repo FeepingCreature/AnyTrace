@@ -1,23 +1,25 @@
-console.log("Hello fromentry.ts");
-import { handler as astroHandler } from '@astrojs/node/server';
+import { defineMiddleware } from 'astro/middleware';
 import { ConfigLoader } from '../config/loader';
 
-// Initialize configuration
+// Initialize configuration once when the module loads
 const configLoader = ConfigLoader.getInstance();
-
-// Ensure configuration is loaded before handling any requests
 try {
     configLoader.loadConfig(process.env.CONFIG_PATH);
-    console.log('Configuration loaded successfully');
+    console.log('Configuration loaded successfully from entry.ts');
 } catch (error) {
     console.error('Failed to load configuration:', error);
     process.exit(1);
 }
 
-export async function handler(request: Request, context: any) {
-    // Verify configuration is loaded before each request
-    if (!configLoader.getConfig()) {
-        throw new Error('Configuration not loaded');
+export const onRequest = defineMiddleware(async (context, next) => {
+    try {
+        // Verify configuration is loaded before each request
+        if (!configLoader.getConfig()) {
+            throw new Error('Configuration not loaded');
+        }
+        return await next();
+    } catch (error) {
+        console.error('Middleware error:', error);
+        return new Response('Server configuration error', { status: 500 });
     }
-    return astroHandler(request, context);
-}
+});
