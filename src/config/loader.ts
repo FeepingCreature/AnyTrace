@@ -17,7 +17,12 @@ export class ConfigLoader {
     }
 
     loadConfig(configPath?: string): AnyTraceConfig {
+        if (this.config) {
+            return this.config;
+        }
+
         const filePath = configPath || path.join(process.cwd(), 'config.yaml');
+        console.log('Loading configuration from:', filePath);
         
         try {
             const fileContents = fs.readFileSync(filePath, 'utf8');
@@ -32,12 +37,12 @@ export class ConfigLoader {
             }
 
             this.config = config;
+            console.log('Configuration loaded successfully');
             return config;
         } catch (error) {
-            if (error instanceof Error) {
-                throw new Error(`Failed to load configuration: ${error.message}`);
-            }
-            throw error;
+            const message = error instanceof Error ? error.message : 'Unknown error';
+            console.error('Failed to load configuration:', message);
+            throw new Error(`Failed to load configuration: ${message}`);
         }
     }
 
