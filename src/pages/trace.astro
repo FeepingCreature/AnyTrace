@@ -53,8 +53,6 @@ if (formSubmitted) {
     })
   };
   
-  // Ensure the response starts streaming
-  await Astro.response.flush();
 }
 ---
 <Layout title={`Trace: ${flow.name}`}>

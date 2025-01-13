@@ -90,32 +90,34 @@ export async function executeTrace(request: TraceRequest): Promise<TraceResult> 
     return result;
   });
 
-  // Return a promise that resolves with the results and update scripts
+  // Create a promise that resolves with the results and scripts
+  const promise = Promise.all(samplerPromises).then(finalResults => ({
+    results: finalResults,
+    scripts: finalResults.map(result => ({
+      samplerId: result.samplerId,
+      script: `
+        (function() {
+          const result = ${JSON.stringify(result)};
+          const samplerElement = document.querySelector('[data-sampler-id="${result.samplerId}"]');
+          if (samplerElement) {
+            const statusElement = samplerElement.querySelector('.sampler-status');
+            const outputElement = samplerElement.querySelector('.sampler-output code');
+            
+            statusElement.className = 'sampler-status ' + result.status;
+            statusElement.innerHTML = getStatusIcon(result.status);
+            
+            if (result.output || result.error) {
+              outputElement.innerHTML = result.output || result.error;
+            }
+          }
+        })();
+      `
+    }))
+  }));
+
   return {
     flowId: flow.id,
     results,
-    promise: Promise.all(samplerPromises).then(finalResults => ({
-      results: finalResults,
-      scripts: finalResults.map(result => ({
-        samplerId: result.samplerId,
-        script: `
-          (function() {
-            const result = ${JSON.stringify(result)};
-            const samplerElement = document.querySelector('[data-sampler-id="${result.samplerId}"]');
-            if (samplerElement) {
-              const statusElement = samplerElement.querySelector('.sampler-status');
-              const outputElement = samplerElement.querySelector('.sampler-output code');
-              
-              statusElement.className = 'sampler-status ' + result.status;
-              statusElement.innerHTML = getStatusIcon(result.status);
-              
-              if (result.output || result.error) {
-                outputElement.innerHTML = result.output || result.error;
-              }
-            }
-          })();
-        `
-      }))
-    }))
+    promise
   };
 }
