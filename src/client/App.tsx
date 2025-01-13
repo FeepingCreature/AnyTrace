@@ -40,10 +40,13 @@ const App: React.FC = () => {
   }, []);
 
   const filteredFlows = useMemo(() => {
-    return flows.filter(flow => 
+    console.log('Filtering flows:', { flows, searchQuery });
+    const filtered = flows.filter(flow => 
       flow.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       flow.id.toLowerCase().includes(searchQuery.toLowerCase())
     );
+    console.log('Filtered flows:', filtered);
+    return filtered;
   }, [flows, searchQuery]);
 
   if (loading) {
@@ -86,7 +89,11 @@ const App: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {filteredFlows.map(flow => (
+              {filteredFlows.length === 0 ? (
+                <tr>
+                  <td colSpan={4} className="loading">No matching flows found</td>
+                </tr>
+              ) : filteredFlows.map(flow => (
                 <tr key={flow.id}>
                   <td>{flow.name}</td>
                   <td>{flow.id}</td>
