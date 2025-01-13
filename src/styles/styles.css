@@ -145,6 +145,7 @@ tr:last-child td {
 
 tr:hover {
     background-color: var(--background-color);
+    cursor: pointer;
 }
 
 .button {

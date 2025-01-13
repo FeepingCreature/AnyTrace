@@ -88,7 +88,6 @@ const App: React.FC = () => {
                 <th>Name</th>
                 <th>ID</th>
                 <th>Samplers</th>
-                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -97,23 +96,16 @@ const App: React.FC = () => {
                   <td colSpan={4} className="loading">No matching flows found</td>
                 </tr>
               ) : filteredFlows.map(flow => (
-                <tr key={flow.id}>
+                <tr 
+                  key={flow.id}
+                  onClick={() => {
+                    console.log("Row clicked, flow:", flow);
+                    setSelectedFlow(flow);
+                  }}
+                >
                   <td>{flow.name}</td>
                   <td>{flow.id}</td>
                   <td>{flow.samplers.length}</td>
-                  <td>
-                    <button 
-                      className="button"
-                      type="button"
-                      onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-                        e.preventDefault();
-                        console.log("Button clicked, flow:", flow);
-                        setSelectedFlow(flow);
-                      }}
-                    >
-                      Start Trace
-                    </button>
-                  </td>
                 </tr>
               ))}
             </tbody>
