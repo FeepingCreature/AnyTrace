@@ -5,6 +5,7 @@ samplers:
       - name: request_id
         type: string
         required: true
+        description: "Request ID"
     command: "grep ${request_id} example/nginx.log"
     timeout: 30
 

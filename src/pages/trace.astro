@@ -55,7 +55,9 @@ if (formSubmitted) {
           return Array.from(uniqueVars.values()).map(variable => (
             <div class="form-group">
               <label>
-                {variable.description}
+                {variable.description || variable.name.split('_').map(word => 
+                  word.charAt(0).toUpperCase() + word.slice(1)
+                ).join(' ')}
                 {variable.required && <span class="required">*</span>}
               </label>
               <input
