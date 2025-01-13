@@ -6,7 +6,7 @@ samplers:
         type: string
         required: true
         description: "Request ID"
-    command: "grep ${request_id} example/nginx.log"
+    command: "grep \"${request_id}\" example/nginx.log"
     timeout: 30
 
   - id: app_logs
@@ -15,7 +15,7 @@ samplers:
       - name: request_id
         type: string
         required: true
-    command: "grep ${request_id} example/app.log"
+    command: "grep \"${request_id}\" example/app.log"
     timeout: 30
 
   - id: db_logs
@@ -24,7 +24,7 @@ samplers:
       - name: request_id
         type: string
         required: true
-    command: "grep ${request_id} example/db.log"
+    command: "grep \"${request_id}\" example/db.log"
     timeout: 30
 
 flows:
