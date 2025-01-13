@@ -28,13 +28,9 @@ try {
         </thead>
         <tbody id="flowsTableBody">
           {flows.map(flow => (
-            <tr>
+            <tr onclick={`window.location.href='/trace?flowId=${flow.id}'`} style="cursor: pointer;">
               <td>{flow.name}</td>
-              <td>
-                <button class="button primary" onclick={`showTraceForm('${flow.id}')`}>
-                  Execute
-                </button>
-              </td>
+              <td>{flow.samplers.length} samplers</td>
             </tr>
           ))}
         </tbody>
