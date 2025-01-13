@@ -75,6 +75,9 @@ export async function executeTrace(request: TraceRequest): Promise<TraceResult> 
     throw new Error(`Flow not found: ${request.flowId}`);
   }
 
+  // Initialize results array
+  const results: SamplerResult[] = new Array(flow.samplers.length);
+  
   // Execute samplers in parallel
   const samplerPromises = flow.samplers.map(async (samplerId, index) => {
     const sampler = config.samplers.find(s => s.id === samplerId);
