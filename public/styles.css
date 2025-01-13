@@ -231,11 +231,19 @@ tr:hover {
 }
 
 .sampler-status.success {
-    color: #22c55e;
+    color: #10b981;
 }
 
 .sampler-status.error {
-    color: #ef4444;
+    color: #dc2626;
+}
+
+.sampler-status.success svg {
+    fill: #10b981;
+}
+
+.sampler-status.error svg {
+    fill: #dc2626;
 }
 
 .sampler-output {
