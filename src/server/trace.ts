@@ -53,7 +53,7 @@ async function executeSampler(sampler: Sampler, variables: Record<string, string
 }
 
 export async function executeTrace(request: TraceRequest): Promise<TraceResult> {
-  const config = ConfigLoader.getInstance().getConfig();
+  const config = ConfigLoader.getInstance().loadConfig();
   
   // Find the requested flow
   const flow = config.flows.find(f => f.id === request.flowId);

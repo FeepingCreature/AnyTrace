@@ -2,8 +2,13 @@
 import Layout from '../layouts/Layout.astro';
 import { ConfigLoader } from '../config/loader';
 
-const config = ConfigLoader.getInstance().getConfig();
-const flows = config.flows;
+let flows = [];
+try {
+  const config = ConfigLoader.getInstance().loadConfig();
+  flows = config.flows;
+} catch (error) {
+  console.error('Failed to load configuration:', error);
+}
 ---
 <Layout title="AnyTrace">
   <div class="container">
