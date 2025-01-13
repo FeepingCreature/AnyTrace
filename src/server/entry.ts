@@ -1,3 +1,4 @@
+console.log("Hello fromentry.ts");
 import { handler as astroHandler } from '@astrojs/node/server';
 import { ConfigLoader } from '../config/loader';
 
