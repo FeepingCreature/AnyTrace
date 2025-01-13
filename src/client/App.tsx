@@ -105,7 +105,7 @@ const App: React.FC = () => {
                     <button 
                       className="button"
                       type="button"
-                      onClick={(e) => {
+                      onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                         e.preventDefault();
                         console.log("Button clicked, flow:", flow);
                         setSelectedFlow(flow);
