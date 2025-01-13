@@ -15,6 +15,34 @@ A microservice tracing tool that allows you to trace configurable events through
 npm install
 ```
 
+## Configuration
+
+Create a `config.yaml` file in your project directory:
+
+```yaml
+samplers:
+  - id: example_sampler
+    name: "Example Sampler"
+    variables:
+      - name: search_term
+        type: string
+        required: true
+    command: "grep ${search_term} /var/log/example.log"
+    timeout: 30
+
+flows:
+  - id: example_flow
+    name: "Example Flow"
+    samplers:
+      - example_sampler
+```
+
+You can specify a custom config location using the CONFIG_PATH environment variable:
+
+```bash
+CONFIG_PATH=/path/to/custom/config.yaml npm start
+```
+
 ## Development
 
 Start the development server:
