@@ -53,7 +53,17 @@ app.get('/api/flows', (req, res) => {
 
 app.post('/api/trace', async (req, res) => {
   try {
-    const result = await executeTrace(req.body);
+    const { flowId, variables } = req.body;
+    
+    if (!flowId || typeof flowId !== 'string') {
+      return res.status(400).json({ error: 'Invalid flowId' });
+    }
+    
+    if (!variables || typeof variables !== 'object') {
+      return res.status(400).json({ error: 'Invalid variables' });
+    }
+
+    const result = await executeTrace({ flowId, variables });
     res.json(result);
   } catch (error) {
     res.status(500).json({ error: (error as Error).message });
