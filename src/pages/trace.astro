@@ -16,8 +16,12 @@ const samplers = flow.samplers.map(samplerId =>
 ).filter(Boolean);
 
 const formSubmitted = Astro.url.searchParams.has('request_id');
-const variables = formSubmitted ? Object.fromEntries(Astro.url.searchParams.entries()) : null;
-delete variables?.flowId;
+let traceResults = null;
+if (formSubmitted) {
+  const variables = Object.fromEntries(Astro.url.searchParams.entries());
+  delete variables.flowId;
+  traceResults = await executeTrace({ flowId, variables });
+}
 ---
 <Layout title={`Trace: ${flow.name}`}>
   <div class="container">
@@ -64,19 +68,31 @@ delete variables?.flowId;
         </form>
       </div>
     ) : (
-      <div class="samplers-list" id="samplersList">
-        {samplers.map(sampler => (
-          <div class="sampler-item" id={`sampler-${sampler.id}`}>
+      <div class="samplers-list">
+        {traceResults.results.map(result => (
+          <div class="sampler-item">
             <div class="sampler-header">
-              <span class="sampler-status pending">
-                <svg class="icon" viewBox="0 0 24 24">
-                  <circle class="spinner" cx="12" cy="12" r="8" />
-                </svg>
+              <span class={`sampler-status ${result.status}`}>
+                {result.status === 'success' && (
+                  <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" />
+                  </svg>
+                )}
+                {result.status === 'error' && (
+                  <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" />
+                  </svg>
+                )}
+                {result.status === 'no-match' && (
+                  <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M19 13H5v-2h14v2z" />
+                  </svg>
+                )}
               </span>
-              <h3>{sampler.name}</h3>
+              <h3>{result.name}</h3>
             </div>
             <div class="sampler-output">
-              <pre><code></code></pre>
+              <pre><code>{result.output || result.error || 'No matches found'}</code></pre>
             </div>
           </div>
         ))}
@@ -84,42 +100,4 @@ delete variables?.flowId;
     )}
     </div>
   </div>
-  <script is:inline>
-    const events = new EventSource(`/api/trace/events?${window.location.search.slice(1)}`);
-
-    events.onmessage = (event) => {
-      const update = JSON.parse(event.data);
-
-      if (update.error) {
-        console.error('Trace error:', update.error);
-        events.close();
-        return;
-      }
-
-      if (update.done) {
-        events.close();
-        return;
-      }
-
-      const samplerElement = document.getElementById(`sampler-${update.samplerId}`);
-      if (!samplerElement) return;
-
-      const statusElement = samplerElement.querySelector('.sampler-status');
-      const outputElement = samplerElement.querySelector('.sampler-output');
-      const codeElement = outputElement.querySelector('code');
-
-      statusElement.className = `sampler-status ${update.status}`;
-      if (update.output) {
-        codeElement.textContent = update.output;
-      }
-      if (update.error) {
-        codeElement.textContent = update.error;
-      }
-    };
-
-    events.onerror = (error) => {
-      console.error('EventSource error:', error);
-      events.close();
-    };
-  </script>
 </Layout>
