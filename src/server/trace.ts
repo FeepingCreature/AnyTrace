@@ -76,33 +76,48 @@ export async function executeTrace(request: TraceRequest): Promise<TraceResult> 
   }
 
   // Execute samplers in parallel and stream results
-  const samplerPromises = flow.samplers.map(async (samplerId) => {
+  const samplerPromises = flow.samplers.map(async (samplerId, index) => {
     const sampler = config.samplers.find(s => s.id === samplerId);
     if (!sampler) {
       throw new Error(`Sampler not found: ${samplerId}`);
     }
-    
+
     const result = await executeSampler(sampler, request.variables);
-    
-    // Stream the result
-    const chunk = new TextEncoder().encode(JSON.stringify(result) + '\n');
-    await Astro.response.write(chunk);
-    
+
+    // Stream a script tag to update the UI
+    const script = `
+      <script>
+        (function() {
+          const result = ${JSON.stringify(result)};
+          const samplerElement = document.querySelector('[data-sampler-id="${result.samplerId}"]');
+          if (samplerElement) {
+            const statusElement = samplerElement.querySelector('.sampler-status');
+            const outputElement = samplerElement.querySelector('.sampler-output code');
+
+            statusElement.className = 'sampler-status ' + result.status;
+            statusElement.innerHTML = getStatusIcon(result.status);
+
+            if (result.output || result.error) {
+              outputElement.innerHTML = result.output || result.error;
+            }
+          }
+        })();
+      </script>
+    `;
+    await Astro.response.write(script);
+
+    results[index] = result;
     return result;
   });
 
-  // Execute all samplers but don't wait for completion
-  Promise.all(samplerPromises).then(() => {
-    Astro.response.end();
-  });
+  // Wait for all samplers to complete
+  await Promise.all(samplerPromises);
+
+  // End the response
+  await Astro.response.end();
 
   return {
     flowId: flow.id,
-    results: flow.samplers.map(samplerId => ({
-      samplerId,
-      name: config.samplers.find(s => s.id === samplerId)?.name || 'Unknown',
-      status: 'pending',
-      output: ''
-    }))
+    results
   };
 }
