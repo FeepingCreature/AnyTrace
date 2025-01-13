@@ -17,7 +17,8 @@ const samplers = flow.samplers.map(samplerId =>
 ).filter(Boolean);
 
 const formSubmitted = Astro.url.searchParams.has('request_id');
-// Initialize results with pending state if form is submitted
+// Initialize trace execution and results
+let traceExecution;
 let traceResults = formSubmitted ? {
   flowId,
   results: flow.samplers.map(samplerId => {
@@ -37,7 +38,7 @@ if (formSubmitted) {
   delete variables.flowId;
   
   // Start trace execution but don't wait for results yet
-  const traceExecution = await executeTrace({ flowId, variables });
+  traceExecution = await executeTrace({ flowId, variables });
   
   // Initialize with pending state
   traceResults = {
