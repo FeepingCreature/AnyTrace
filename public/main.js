@@ -112,19 +112,8 @@ async function handleTraceSubmit(event) {
     }
 
     try {
-        const response = await fetch('/api/trace', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                flowId: currentFlow.id,
-                variables
-            })
-        });
-
-        const result = await response.json();
-        window.location.href = `/trace.html?id=${result.traceId}`;
+        const queryString = new URLSearchParams(variables).toString();
+        window.location.href = `/trace/${currentFlow.id}?${queryString}`;
     } catch (error) {
         console.error('Failed to execute trace:', error);
     }

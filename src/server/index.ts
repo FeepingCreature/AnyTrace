@@ -38,24 +38,47 @@ app.get('/api/flows', (req, res) => {
   }
 });
 
-app.post('/api/trace', async (req, res) => {
-  try {
-    console.log('Received trace request:', req.body);
-    const { flowId, variables } = req.body;
-    
-    if (!flowId || typeof flowId !== 'string') {
-      return res.status(400).json({ error: 'Invalid flowId' });
-    }
-    
-    if (!variables || typeof variables !== 'object') {
-      return res.status(400).json({ error: 'Invalid variables' });
-    }
+app.get('/trace/:flowId', (req, res) => {
+  res.sendFile(path.join(__dirname, '../../public/trace.html'));
+});
 
-    const result = await executeTrace({ flowId, variables });
-    res.json(result);
-  } catch (error) {
-    res.status(500).json({ error: (error as Error).message });
+app.get('/api/trace/:flowId/events', (req, res) => {
+  const flowId = req.params.flowId;
+  const variables = req.query;
+
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+
+  // Send initial trace data
+  const config = configLoader.getConfig();
+  const flow = config.flows.find(f => f.id === flowId);
+  
+  if (!flow) {
+    res.write(`data: ${JSON.stringify({ error: 'Flow not found' })}\n\n`);
+    res.end();
+    return;
   }
+
+  // Execute trace and send updates
+  executeTrace({ flowId, variables: variables as Record<string, string> })
+    .then(result => {
+      result.results.forEach((samplerResult, index) => {
+        setTimeout(() => {
+          res.write(`data: ${JSON.stringify(samplerResult)}\n\n`);
+        }, index * 100); // Stagger updates for visual effect
+      });
+      
+      // End stream after all results
+      setTimeout(() => {
+        res.write(`data: ${JSON.stringify({ done: true })}\n\n`);
+        res.end();
+      }, result.results.length * 100);
+    })
+    .catch(error => {
+      res.write(`data: ${JSON.stringify({ error: error.message })}\n\n`);
+      res.end();
+    });
 });
 
 app.listen(port, () => {
