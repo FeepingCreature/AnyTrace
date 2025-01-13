@@ -75,49 +75,44 @@ export async function executeTrace(request: TraceRequest): Promise<TraceResult> 
     throw new Error(`Flow not found: ${request.flowId}`);
   }
 
-  // Execute samplers in parallel and stream results
+  // Execute samplers in parallel
   const samplerPromises = flow.samplers.map(async (samplerId, index) => {
     const sampler = config.samplers.find(s => s.id === samplerId);
     if (!sampler) {
       throw new Error(`Sampler not found: ${samplerId}`);
     }
-
+    
     const result = await executeSampler(sampler, request.variables);
-
-    // Stream a script tag to update the UI
-    const script = `
-      <script>
-        (function() {
-          const result = ${JSON.stringify(result)};
-          const samplerElement = document.querySelector('[data-sampler-id="${result.samplerId}"]');
-          if (samplerElement) {
-            const statusElement = samplerElement.querySelector('.sampler-status');
-            const outputElement = samplerElement.querySelector('.sampler-output code');
-
-            statusElement.className = 'sampler-status ' + result.status;
-            statusElement.innerHTML = getStatusIcon(result.status);
-
-            if (result.output || result.error) {
-              outputElement.innerHTML = result.output || result.error;
-            }
-          }
-        })();
-      </script>
-    `;
-    await Astro.response.write(script);
-
     results[index] = result;
     return result;
   });
 
-  // Wait for all samplers to complete
-  await Promise.all(samplerPromises);
-
-  // End the response
-  await Astro.response.end();
-
+  // Return a promise that resolves with the results and update scripts
   return {
     flowId: flow.id,
-    results
+    results,
+    promise: Promise.all(samplerPromises).then(finalResults => ({
+      results: finalResults,
+      scripts: finalResults.map(result => ({
+        samplerId: result.samplerId,
+        script: `
+          (function() {
+            const result = ${JSON.stringify(result)};
+            const samplerElement = document.querySelector('[data-sampler-id="${result.samplerId}"]');
+            if (samplerElement) {
+              const statusElement = samplerElement.querySelector('.sampler-status');
+              const outputElement = samplerElement.querySelector('.sampler-output code');
+              
+              statusElement.className = 'sampler-status ' + result.status;
+              statusElement.innerHTML = getStatusIcon(result.status);
+              
+              if (result.output || result.error) {
+                outputElement.innerHTML = result.output || result.error;
+              }
+            }
+          })();
+        `
+      }))
+    }))
   };
 }

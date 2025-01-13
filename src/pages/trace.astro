@@ -31,14 +31,17 @@ let traceResults = formSubmitted ? {
   })
 } : null;
 
-// If form is submitted, start trace execution after sending the response
+// If form is submitted, start trace execution
 if (formSubmitted) {
   const variables = Object.fromEntries(Astro.url.searchParams.entries());
   delete variables.flowId;
   
-  // Use Response.write to stream updates
-  Astro.response.headers.set('Content-Type', 'text/html; charset=utf-8');
-  Astro.response.headers.set('Transfer-Encoding', 'chunked');
+  const traceExecution = await executeTrace({ flowId, variables });
+  const executionResults = await traceExecution.promise;
+  traceResults = {
+    flowId,
+    results: executionResults.results
+  };
 }
 ---
 <Layout title={`Trace: ${flow.name}`}>
@@ -167,4 +170,11 @@ if (formSubmitted) {
       }
     }
   </script>
+  {formSubmitted && (
+    <Fragment>
+      {(await traceExecution.promise).scripts.map(({script}) => (
+        <script is:inline set:html={script}></script>
+      ))}
+    </Fragment>
+  )}
 </Layout>
