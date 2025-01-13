@@ -75,6 +75,9 @@ const App: React.FC = () => {
         />
       </div>
 
+      <div style={{marginBottom: '1rem'}}>
+        Debug - Selected Flow: {selectedFlow ? JSON.stringify(selectedFlow) : 'null'}
+      </div>
       <div className="flows-table">
         {flows.length === 0 ? (
           <div className="loading">No flows configured</div>
@@ -103,8 +106,10 @@ const App: React.FC = () => {
                       className="button"
                       onClick={() => {
                         console.log('Start Trace clicked for flow:', flow);
-                        console.log('Setting selectedFlow state');
+                        console.log('Current selectedFlow:', selectedFlow);
+                        console.log('Setting selectedFlow state to:', flow);
                         setSelectedFlow(flow);
+                        console.log('State set, selectedFlow should update');
                       }}
                     >
                       Start Trace
