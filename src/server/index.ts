@@ -1,7 +1,5 @@
 import express from 'express';
 import path from 'path';
-import webpack from 'webpack';
-import webpackDevMiddleware from 'webpack-dev-middleware';
 import { executeTrace } from './trace';
 import { ConfigLoader } from '../config/loader';
 
@@ -19,18 +17,7 @@ try {
 }
 
 app.use(express.json());
-
-if (process.env.NODE_ENV !== 'production') {
-  const webpackConfig = require('../../webpack.config.js');
-  const compiler = webpack(webpackConfig);
-  app.use(
-    webpackDevMiddleware(compiler, {
-      publicPath: webpackConfig.output.publicPath || '/',
-    })
-  );
-} else {
-  app.use(express.static(path.join(__dirname, '../../public')));
-}
+app.use(express.static(path.join(__dirname, '../../public')));
 
 // Serve list of flows
 app.get('/api/samplers', (req, res) => {
