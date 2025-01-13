@@ -36,12 +36,25 @@ if (formSubmitted) {
   const variables = Object.fromEntries(Astro.url.searchParams.entries());
   delete variables.flowId;
   
+  // Start trace execution but don't wait for results yet
   const traceExecution = await executeTrace({ flowId, variables });
-  const executionResults = await traceExecution.promise;
+  
+  // Initialize with pending state
   traceResults = {
     flowId,
-    results: executionResults.results
+    results: flow.samplers.map(samplerId => {
+      const sampler = config.samplers.find(s => s.id === samplerId);
+      return {
+        samplerId,
+        name: sampler?.name || 'Unknown',
+        status: 'pending',
+        output: ''
+      };
+    })
   };
+  
+  // Ensure the response starts streaming
+  await Astro.response.flush();
 }
 ---
 <Layout title={`Trace: ${flow.name}`}>
