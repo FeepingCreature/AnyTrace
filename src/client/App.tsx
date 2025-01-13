@@ -105,7 +105,11 @@ const App: React.FC = () => {
                     <button 
                       className="button"
                       type="button"
-                      onClick={() => setSelectedFlow(flow)}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        console.log("Button clicked, flow:", flow);
+                        setSelectedFlow(flow);
+                      }}
                     >
                       Start Trace
                     </button>
