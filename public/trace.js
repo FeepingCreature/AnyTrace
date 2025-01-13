@@ -68,7 +68,7 @@ function updateSamplerStatus(update) {
     const outputElement = samplerElement.querySelector('.sampler-output');
     const codeElement = outputElement.querySelector('code');
 
-    statusElement.className = `sampler-status ${update.status}`;
+    statusElement.className = 'sampler-status ' + update.status;
 
     // Update status icon
     if (update.status === 'success') {
