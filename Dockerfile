@@ -24,8 +24,9 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY package*.json ./
 COPY config.yaml ./
 
-# Expose the port the app runs on
+# Set environment variables
 ENV PORT=3000
+ENV HOST=0.0.0.0
 EXPOSE 3000
 
 # Start the application
