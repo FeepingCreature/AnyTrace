@@ -17,16 +17,11 @@ const samplers = flow.samplers.map(samplerId =>
 ).filter(Boolean);
 
 const formSubmitted = Astro.url.searchParams.has('request_id');
-let traceExecution;
 let traceResults;
 
 if (formSubmitted) {
   const variables = Object.fromEntries(Astro.url.searchParams.entries());
-  traceExecution = await executeTrace({ flowId, variables });
-  traceResults = {
-    flowId: traceExecution.flowId,
-    results: traceExecution.samplerPromises
-  };
+  traceResults = await executeTrace({ flowId, variables });
 }
 ---
 <Layout title={`Trace: ${flow.name}`}>
@@ -134,8 +129,8 @@ if (formSubmitted) {
     window.getStatusIcon = getStatusIcon;
   </script>
   {formSubmitted && (async function* () {
-    const promises = traceResults.results.map((result, index) =>
-      result.then(finalResult => ({finalResult, index}))
+    const promises = traceResults.samplerPromises.map((promise, index) =>
+      promise.then(finalResult => ({finalResult, index}))
     );
 
     // Create a pool of pending promises
