@@ -96,10 +96,5 @@ npm start
 
 ## Security Considerations
 
-This tool executes shell commands. Please ensure:
-- Only trusted configurations are used
-- Input validation is enabled
-- Command injection is prevented
-- Timeouts are enforced
-- Resource limits are set
-- Access controls are in place
+This tool executes shell commands with arbitrary parameters.
+Please either limit access to trusted personnel only, or ensure that every sampler script correctly quotes every variable it uses.
