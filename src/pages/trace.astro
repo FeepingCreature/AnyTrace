@@ -97,37 +97,25 @@ if (formSubmitted) {
 
     {formSubmitted && (
       <div class="samplers-list">
-        {traceResults.results.map(result => (
+        {traceResults.samplers.map(sampler => (
           <div class="sampler-item">
             <div class="sampler-header">
               <div style="display: flex; align-items: center;">
-                <span class={`sampler-status ${result.status}`}>
-                  {result.status === 'success' && (
-                    <svg class="icon" viewBox="0 0 24 24">
-                      <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" />
-                    </svg>
-                  )}
-                  {result.status === 'error' && (
-                    <svg class="icon" viewBox="0 0 24 24">
-                      <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" />
-                    </svg>
-                  )}
-                  {result.status === 'no-match' && (
-                    <svg class="icon" viewBox="0 0 24 24">
-                      <path d="M19 13H5v-2h14v2z" />
-                    </svg>
-                  )}
+                <span class="sampler-status pending" data-sampler-id={sampler.id}>
+                  <svg class="icon" viewBox="0 0 24 24">
+                    <circle class="spinner" cx="12" cy="12" r="10"/>
+                  </svg>
                 </span>
-                <h3>{result.name}</h3>
-                <span class="toggle-output" onclick={`toggleOutput('${result.samplerId}')`}>
+                <h3>{sampler.name}</h3>
+                <span class="toggle-output" onclick={`toggleOutput('${sampler.id}')`}>
                   <svg class="icon" viewBox="0 0 24 24" width="24" height="24">
                     <path d="M7 10l5 5 5-5H7z" />
                   </svg>
                 </span>
               </div>
             </div>
-            <div class="sampler-output" id={`output-${result.samplerId}`}>
-              <pre><code set:html={result.output || result.error || 'No matches found'}></code></pre>
+            <div class="sampler-output" id={`output-${sampler.id}`}>
+              <pre><code>Running...</code></pre>
             </div>
           </div>
         ))}
@@ -141,19 +129,9 @@ if (formSubmitted) {
       output.classList.toggle('expanded');
     }
   </script>
-  <script is:inline>
-    function getStatusIcon(status) {
-      switch (status) {
-        case 'success':
-          return '<svg class="icon" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" /></svg>';
-        case 'error':
-          return '<svg class="icon" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" /></svg>';
-        case 'no-match':
-          return '<svg class="icon" viewBox="0 0 24 24"><path d="M19 13H5v-2h14v2z" /></svg>';
-        default:
-          return '<svg class="icon" viewBox="0 0 24 24"><circle class="spinner" cx="12" cy="12" r="10"/></svg>';
-      }
-    }
+  <script>
+    import { getStatusIcon } from '../components/icons';
+    window.getStatusIcon = getStatusIcon;
   </script>
   {formSubmitted && (async function* () {
     const promises = traceResults.results.map((result, index) =>

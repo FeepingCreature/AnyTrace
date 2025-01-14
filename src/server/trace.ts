@@ -75,18 +75,30 @@ export async function executeTrace(request: TraceRequest): Promise<TraceResult> 
     throw new Error(`Flow not found: ${request.flowId}`);
   }
   
-  // Execute samplers in parallel with self-removing promises
+  // Get sampler info upfront
+  const samplerInfo = flow.samplers.map(samplerId => {
+    const sampler = config.samplers.find(s => s.id === samplerId);
+    if (!sampler) {
+      throw new Error(`Sampler not found: ${samplerId}`);
+    }
+    return {
+      id: sampler.id,
+      name: sampler.name
+    };
+  });
+
+  // Execute samplers in parallel
   const samplerPromises = flow.samplers.map(async (samplerId, index) => {
     const sampler = config.samplers.find(s => s.id === samplerId);
     if (!sampler) {
       throw new Error(`Sampler not found: ${samplerId}`);
     }
-
     return executeSampler(sampler, request.variables);
   });
 
   return {
     flowId: flow.id,
+    samplers: samplerInfo,
     samplerPromises
   }
 }
