@@ -101,7 +101,7 @@ if (formSubmitted) {
                     <circle class="spinner" cx="12" cy="12" r="10"/>
                   </svg>
                 </span>
-                <h3>{sampler.name}</h3>
+                <h3 onclick={`toggleOutput('${sampler.id}')`} style="cursor: pointer;">{sampler.name}</h3>
                 <span class="toggle-output" onclick={`toggleOutput('${sampler.id}')`}>
                   <svg class="icon" viewBox="0 0 24 24" width="24" height="24">
                     <path d="M7 10l5 5 5-5H7z" />
