@@ -4,6 +4,26 @@
   "description": "Command-based microservice tracing tool",
   "license": "BSL-1.0",
   "main": "dist/server/index.js",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/FeepingCreature/anytrace.git"
+  },
+  "keywords": [
+    "microservices",
+    "tracing",
+    "logging",
+    "debugging",
+    "monitoring"
+  ],
+  "author": "Mathis Beer",
+  "bugs": {
+    "url": "https://github.com/FeepingCreature/anytrace/issues"
+  },
+  "homepage": "https://github.com/FeepingCreature/anytrace#readme",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "scripts": {
     "start": "node ./dist/server/entry.mjs",
     "dev": "astro dev",
