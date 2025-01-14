@@ -16,7 +16,16 @@ const samplers = flow.samplers.map(samplerId =>
   config.samplers.find(s => s.id === samplerId)
 ).filter(Boolean);
 
-const formSubmitted = Astro.url.searchParams.has('request_id');
+// Check if all required variables have been provided
+const requiredVariables = new Set();
+samplers.forEach(sampler => {
+  sampler?.variables
+    .filter(v => v.required)
+    .forEach(v => requiredVariables.add(v.name));
+});
+
+const formSubmitted = Array.from(requiredVariables)
+  .every(varName => Astro.url.searchParams.has(varName));
 let traceResults;
 
 if (formSubmitted) {
