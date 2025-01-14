@@ -9,6 +9,10 @@ Instead, tell AnyTrace how to do it, and just enter your request ID.
 
 You'll see at a glance where the request flow stopped.
 
+## AI Disclaimer
+
+This repository has been created almost entirely by Claude 3.5 Sonnet.
+
 ## Quick Start
 
 1. Install dependencies:
