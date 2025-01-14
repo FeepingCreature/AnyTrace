@@ -155,32 +155,41 @@ if (formSubmitted) {
       }
     }
   </script>
-  {formSubmitted && traceResults.results.map((result, index) => (
-    <Fragment>
-      {(async () => {
-        console.log(`fragment ${index} awaits result`);
-        const finalResult = await result;
-        console.log(`fragment ${index} done: ${JSON.stringify(finalResult)}`);
-        return (
-          <script is:inline set:html={`
-            (function() {
-              const result = ${JSON.stringify(finalResult)};
-              const samplerElement = document.querySelector('[data-sampler-id="${finalResult.samplerId}"]');
-              if (samplerElement) {
-                const statusElement = samplerElement.querySelector('.sampler-status');
-                const outputElement = samplerElement.querySelector('.sampler-output code');
+  {formSubmitted && (async function* () {
+    const promises = traceResults.results.map((result, index) =>
+      result.then(finalResult => ({finalResult, index}))
+    );
 
-                statusElement.className = 'sampler-status ' + result.status;
-                statusElement.innerHTML = getStatusIcon(result.status);
+    // Create a pool of pending promises
+    let pending = [...promises];
 
-                if (result.output || result.error) {
-                  outputElement.innerHTML = result.output || result.error;
-                }
-              }
-            })();
-          `}></script>
-        );
-      })()}
-    </Fragment>
-  ))}
+    while (pending.length > 0) {
+      // Wait for the first promise to complete
+      const completed = await Promise.race(pending);
+
+      // Remove the completed promise from pending
+      pending = pending.filter(p => p !== promises[completed.index]);
+
+      console.log(`fragment ${completed.index} done: ${JSON.stringify(completed.finalResult)}`);
+
+      // Yield the script tag for this result
+      yield (<script is:inline set:html={`
+        (function() {
+          const result = ${JSON.stringify(completed.finalResult)};
+          const samplerElement = document.querySelector('[data-sampler-id="${completed.finalResult.samplerId}"]');
+          if (samplerElement) {
+            const statusElement = samplerElement.querySelector('.sampler-status');
+            const outputElement = samplerElement.querySelector('.sampler-output code');
+
+            statusElement.className = 'sampler-status ' + result.status;
+            statusElement.innerHTML = getStatusIcon(result.status);
+
+            if (result.output || result.error) {
+              outputElement.innerHTML = result.output || result.error;
+            }
+          }
+        })();
+      `}></script>);
+    }
+  })()}
 </Layout>
