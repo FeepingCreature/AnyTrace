@@ -4,7 +4,7 @@
 
 ### Samplers
 A sampler is a configured script that:
-- Takes a fixed set of typed input variables (strings and flags for now) as environment variables
+- Takes a fixed set of typed input variables (strings and flags) as environment variables
 - Executes an arbitrary command (e.g., grep, network requests)
 - Outputs matching log entries or line-based content
 - Has a configurable timeout
@@ -22,35 +22,36 @@ All configuration is stored in a central YAML file that defines:
 1. Sampler definitions:
    - Name and ID
    - Required variables and their types
-   - Command to execute
+   - Command to execute with variable interpolation
    - Timeout settings
+   - Variable descriptions (optional)
    
 2. Flow definitions:
    - Name and ID
    - Ordered list of sampler references
-   
+
 ## Execution Model
 
 1. UI Flow List:
    - Shows all configured flows
-   - Provides filtering capabilities
-   - Allows flow selection
+   - Real-time search filtering
+   - Click to trace execution
 
 2. Variable Collection:
-   - On flow selection, scans all referenced samplers
-   - Aggregates unique required variables
-   - Presents a dynamic form with typed input fields
+   - On flow selection, scans all listed samplers
+   - Queries deduplicated required variables
 
 3. Execution:
-   - Runs all samplers in parallel when variables are provided
+   - Runs all samplers in parallel
    - Shows execution progress with spinners
-   - Timeout monitoring for each sampler
+   - Timeout monitoring
 
 4. Results Display:
-   - Green check: Sampler found matching lines (success)
-   - Grey dash: No matches found (neutral)
-   - Red X: Error output or timeout (failure)
-   - Collapsible output display for each sampler
+   - Green check: Sampler found match (success)
+   - Grey dash: No match found (neutral)
+   - Red X: Error or timeout (failure)
+   - Collapsible output view
+   - Real-time updates as samplers complete
 
 ## Example Configuration
 
@@ -61,9 +62,16 @@ samplers:
     variables:
       - name: request_id
         type: string
+        description: "Request ID to trace"
     command: "grep ${request_id} /var/log/nginx/access.log"
-    timeout: 30s
-  - id: ...
+    timeout: 30
+  - id: app_logs
+    name: "Application Logs" 
+    variables:
+      - name: request_id
+        type: string
+    command: "grep ${request_id} /var/log/app.log"
+    timeout: 30
 
 flows:
   - id: http_request_trace
@@ -71,14 +79,12 @@ flows:
     samplers:
       - nginx_access
       - app_logs
-      - db_queries
 ```
 
 ## Security Considerations
 
 - Samplers execute arbitrary commands
 - Input validation is critical
-- Environment variable sanitization
-  - Though the UI cannot write arbitrary variables at least. Beware injection!
+- Prevent command injection!
 - Timeout enforcement
 - Resource usage limits

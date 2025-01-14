@@ -153,8 +153,6 @@ if (formSubmitted) {
       // Remove the completed promise from pending
       pending = pending.filter(p => p !== promises[completed.index]);
 
-      console.log(`fragment ${completed.index} done: ${JSON.stringify(completed.finalResult)}`);
-
       // Yield the script tag for this result
       yield (<script is:inline set:html={`
         (function() {

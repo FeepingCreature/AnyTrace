@@ -1,90 +1,101 @@
 # AnyTrace
 
-A microservice tracing tool that allows you to trace configurable events through a microservice system by invoking shell scripts.
+Every time you want to know what happened in response to a web request,
+you have to check logs in ten microservices before the response is sent.
 
-## Features
+The various log locations take time to memorize.
 
-- Web-based UI for configuring and viewing traces
-- Backend capability to execute shell scripts
-- Real-time trace visualization
-- Configurable event tracking
-- YAML-based configuration system
+Instead, tell AnyTrace how to do it, and just enter your request ID.
 
-## Setup
+You'll see at a glance where the request flow stopped.
 
+## Quick Start
+
+1. Install dependencies:
 ```bash
 npm install
 ```
 
-## Configuration
-
-AnyTrace uses YAML configuration files to define samplers and flows. By default, it looks for `config.yaml` in the current directory.
-
-### Default Configuration Location
-Create `config.yaml` in your project directory:
-
+2. Create a config.yaml file:
 ```yaml
 samplers:
-  - id: example_sampler
-    name: "Example Sampler"
+  - id: example_logs
+    name: "Example Logs"
     variables:
-      - name: search_term
+      - name: request_id
         type: string
+        description: "Request ID to trace"
         required: true
-    command: "grep ${search_term} /var/log/example.log"
+    command: "grep ${request_id} /var/log/example.log"
     timeout: 30
 
 flows:
   - id: example_flow
     name: "Example Flow"
     samplers:
-      - example_sampler
+      - example_logs
 ```
 
-### Custom Configuration
-You can specify a custom config location using:
-
-```bash
-CONFIG_PATH=/path/to/custom/config.yaml npm start
-```
-
-## Development
-
-Start the development server:
-
+3. Start the development server:
 ```bash
 npm run dev
 ```
 
-## Building
+## Configuration
 
-Build the project:
+AnyTrace uses a YAML configuration file to define samplers and flows:
 
+### Samplers
+- Unique ID
+- Required variables with types and descriptions
+- Shell command with variable interpolation
+- Timeout setting
+
+### Flows
+- Unique ID
+- Ordered list of sampler references
+- Variables automatically aggregated from samplers
+
+### Custom Configuration Path
+```bash
+CONFIG_PATH=/path/to/config.yaml npm start
+```
+
+## Development
+
+Start development server with hot reload:
+```bash
+npm run dev
+```
+
+Run tests:
+```bash
+npm test
+```
+
+Lint code:
+```bash
+npm run lint
+```
+
+## Production
+
+Build for production:
 ```bash
 npm run build
 ```
 
-## Deployment
-
-1. Build the project:
-```bash
-npm run build
-```
-
-2. Start with default config:
+Start production server:
 ```bash
 npm start
 ```
 
-Or with custom config:
-```bash
-CONFIG_PATH=/etc/anytrace/config.yaml npm start
-```
+## Security Considerations
 
-## Security Note
-
-This tool executes shell commands on the host system. Please ensure:
+This tool executes shell commands. Please ensure:
 - Only trusted configurations are used
 - Input validation is enabled
-- Proper access controls are in place
-- Command execution is restricted as needed
+- Command injection is prevented
+- Timeouts are enforced
+- Resource limits are set
+- Access controls are in place
