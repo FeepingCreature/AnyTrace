@@ -2,6 +2,7 @@
   "name": "anytrace",
   "version": "0.1.0",
   "description": "Command-based microservice tracing tool",
+  "license": "BSL-1.0",
   "main": "dist/server/index.js",
   "scripts": {
     "start": "node ./dist/server/entry.mjs",
