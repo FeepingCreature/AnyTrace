@@ -118,15 +118,15 @@ if (formSubmitted) {
     )}
     </div>
   </div>
+  <script>
+    import { getStatusIcon } from '../components/icons';
+    window.getStatusIcon = getStatusIcon;
+  </script>
   <script is:inline>
     function toggleOutput(samplerId) {
       const output = document.getElementById(`output-${samplerId}`);
       output.classList.toggle('expanded');
     }
-  </script>
-  <script>
-    import { getStatusIcon } from '../components/icons';
-    window.getStatusIcon = getStatusIcon;
   </script>
   {formSubmitted && (async function* () {
     const promises = traceResults.samplerPromises.map((promise, index) =>
